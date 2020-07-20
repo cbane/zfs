@@ -15,7 +15,7 @@
 # Send notification in response to a fault induced statechange
 #
 # ZEVENT_SUBCLASS: 'statechange'
-# ZEVENT_VDEV_STATE_STR: 'DEGRADED', 'FAULTED' or 'REMOVED'
+# ZEVENT_VDEV_STATE_STR: 'DEGRADED', 'FAULTED', 'UNAVAIL' or 'REMOVED'
 #
 # Exit codes:
 #   0: notification sent
@@ -31,6 +31,7 @@
 
 if [ "${ZEVENT_VDEV_STATE_STR}" != "FAULTED" ] \
         && [ "${ZEVENT_VDEV_STATE_STR}" != "DEGRADED" ] \
+        && [ "${ZEVENT_VDEV_STATE_STR}" != "UNAVAIL" ] \
         && [ "${ZEVENT_VDEV_STATE_STR}" != "REMOVED" ]; then
     exit 3
 fi
@@ -46,6 +47,8 @@ note_pathname="${TMPDIR:="/tmp"}/$(basename -- "$0").${ZEVENT_EID}.$$"
         echo "The number of checksum errors associated with a ZFS device"
         echo "exceeded acceptable levels. ZFS has marked the device as"
         echo "degraded."
+    elif [ "${ZEVENT_VDEV_STATE_STR}" = "UNAVAIL" ] ; then
+        echo "ZFS has detected that a device is unavailable."
     else
         echo "ZFS has detected that a device was removed."
     fi
